@@ -6,20 +6,20 @@ Serial Monitor baud: 115200
 
 ## Wiring
 
-- FSR voltage divider midpoint -> GPIO33
+- FSR signal -> GPIO36
 - ADXL335 XOUT -> GPIO34
-- ADXL335 YOUT -> GPIO35
-- ADXL335 ZOUT -> GPIO32
+- ADXL335 YOUT -> GPIO32
+- ADXL335 ZOUT -> GPIO33
 - ADXL335 VCC -> 3.3V
 - ADXL335 GND -> GND
-- FSR divider: 3.3V -> FSR -> GPIO33 -> 10k ohm -> GND
-- Optional status LED: GPIO18 -> 220 ohm resistor -> LED anode, LED cathode -> GND
+- FSR divider: 3.3V -> FSR -> GPIO36 -> 10k ohm -> GND
+- LED metronome guide: GPIO18 -> 220 ohm resistor -> LED anode, LED cathode -> GND
 
 ## Power Switch and LED Assumptions
 
 - The physical switch is intended to be a hardware power ON/OFF switch.
 - The switch is not used as a calibration button in firmware.
-- The GPIO18 LED is a software-controlled CPR status indicator, not necessarily a true power LED.
+- The GPIO18 LED is a software-controlled metronome pacing guide (about 110 BPM), not a true "correct BPM" indicator from measured user rate.
 - If you want a true always-on power LED, wire it directly from 3.3V through a resistor to GND (not through a GPIO pin).
 
 ## Standalone Demo
@@ -45,9 +45,4 @@ http://192.168.4.1
 
 The firmware also handles common captive portal probe routes and unknown routes by serving the dashboard.
 
-`GET /data` includes `ledMode` with one of:
-
-- `not_calibrated`: slow blink
-- `waiting`: calibrated but waiting for compressions (LED mostly off with brief pulse)
-- `good_rate`: compression rate in 100-120 CPM (solid ON)
-- `bad_rate`: compression rate outside target (fast blink)
+`GET /data` includes `ledMode` as `metronome_110` for the pacing guide LED mode.

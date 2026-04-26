@@ -17,7 +17,7 @@ static const int FORCE_PIN = 36;  // FSR voltage divider midpoint
 static const int ACCEL_X_PIN = 34; // ADXL335 XOUT
 static const int ACCEL_Y_PIN = 32; // ADXL335 YOUT
 static const int ACCEL_Z_PIN = 33; // ADXL335 ZOUT
-static const int LED_PIN = 18; // Optional CPR status LED (GPIO18 -> resistor -> LED -> GND)
+static const int LED_PIN = 18; // Optional CPR metronome guide LED (GPIO18 -> resistor -> LED -> GND)
 
 // Tunable CPR demo thresholds. These are relative-force thresholds, not depth.
 static const int DEFAULT_FORCE_TARGET = 800;
@@ -25,7 +25,7 @@ static const int DEFAULT_START_THRESHOLD = 300;
 static const int MIN_FORCE_TARGET = 100;
 static const int RECOIL_THRESHOLD = 30;
 static const unsigned long COMPRESSION_DEBOUNCE_MS = 250;
-static const unsigned long LED_METRONOME_INTERVAL_MS = 500; // 120 BPM
+static const unsigned long LED_METRONOME_INTERVAL_MS = 545; // ~110 BPM pacing guide
 static const unsigned long LED_METRONOME_ON_MS = 110;
 static const bool ENABLE_SERIAL_MONITOR_TELEMETRY = true;
 static const unsigned long SERIAL_TELEMETRY_INTERVAL_MS = 250;
@@ -50,9 +50,9 @@ unsigned long lastCompressionTimeMs = 0;
 unsigned long lastCompletedCompressionMs = 0;
 float compressionRate = 0.0;
 
-enum LedMode { LED_MODE_METRONOME_120 };
+enum LedMode { LED_MODE_METRONOME_110 };
 
-LedMode ledMode = LED_MODE_METRONOME_120;
+LedMode ledMode = LED_MODE_METRONOME_110;
 bool ledOutputHigh = false;
 unsigned long lastSerialTelemetryMs = 0;
 
@@ -628,7 +628,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     window.addEventListener("resize", () => {
       if (state.latest) drawGraph(round(state.latest.forceTarget));
     });
-    setInterval(pollData, 75);
+    setInterval(pollData, 100);
     pollData();
   </script>
 </body>
@@ -666,20 +666,20 @@ void resetCompressionStats() {
 }
 
 LedMode computeLedMode() {
-  return LED_MODE_METRONOME_120;
+  return LED_MODE_METRONOME_110;
 }
 
 const char* ledModeText(LedMode mode) {
   switch (mode) {
-    case LED_MODE_METRONOME_120:
-      return "metronome_120";
+    case LED_MODE_METRONOME_110:
+      return "metronome_110";
   }
-  return "metronome_120";
+  return "metronome_110";
 }
 
 bool ledBaseStateForMode(LedMode mode, unsigned long nowMs) {
   switch (mode) {
-    case LED_MODE_METRONOME_120:
+    case LED_MODE_METRONOME_110:
       return (nowMs % LED_METRONOME_INTERVAL_MS) < LED_METRONOME_ON_MS;
   }
   return false;
